@@ -1,10 +1,15 @@
 package dev
 
 import (
-	"github.com/elsaland/elsa/core"
+	"fmt"
+
 	"github.com/elsaland/quickjs"
 )
 
+// ReportDiagnostics report TypeScript diagnostics
 func ReportDiagnostics(diagnostics quickjs.Value) {
-	core.LogError(diagnostics.String(), "")
+	diag := diagnostics.String()
+	if diag != "" {
+		fmt.Println(diagnostics.String())
+	}
 }

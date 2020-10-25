@@ -4,32 +4,27 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/elsaland/elsa/cmd"
+	"github.com/elsaland/elsa/core/options"
+	"github.com/elsaland/elsa/util"
+
 	"github.com/elsaland/elsa/core"
 	"github.com/elsaland/quickjs"
 )
 
-func Compile(source string, fn func(val quickjs.Value), flags cmd.Perms) {
+func Compile(source string, sourceFile string, fn func(val quickjs.Value), flags *options.Perms, args []string) {
 	data, err := core.Asset("typescript/typescript.js")
 	if err != nil {
 		panic("Asset was not found.")
 	}
-	elsaEvt, err := core.Asset("target/elsa.js")
-	if err != nil {
-		panic("Asset was not found.")
-	}
-	dts, er := core.Asset("typescript/lib.es6.d.ts")
-	if er != nil {
-		panic("Asset was not found.")
-	}
 
 	runtime.LockOSThread()
-
 	jsruntime := quickjs.NewRuntime()
 	defer jsruntime.Free()
 
 	context := jsruntime.NewContext()
 	defer context.Free()
+
+	core.PrepareRuntimeContext(context, jsruntime, args, flags, "dev")
 
 	globals := context.Globals()
 	report := func(ctx *quickjs.Context, this quickjs.Value, args []quickjs.Value) quickjs.Value {
@@ -37,18 +32,20 @@ func Compile(source string, fn func(val quickjs.Value), flags cmd.Perms) {
 		return ctx.Null()
 	}
 	d := func(ctx *quickjs.Context, this quickjs.Value, args []quickjs.Value) quickjs.Value {
-		return ctx.String(string(dts))
+		asset, er := core.Asset(args[0].String())
+		if er != nil {
+			panic("Asset was not found.")
+		}
+		return ctx.String(string(asset))
 	}
-	elsa := &core.Elsa{Perms: flags}
-	globals.Set("__send", context.Function(core.ElsaSendNS(elsa)))
-	globals.Set("__report", context.Function(report))
-	globals.Set("__getDTS", context.Function(d))
-	bundle := string(elsaEvt) + string(data) + jsCheck(source)
+	globals.Set("Report", context.Function(report))
+	globals.Set("Asset", context.Function(d))
+	bundle := string(data) + jsCheck(source, sourceFile)
 	result, err := context.Eval(bundle)
-	core.Check(err)
+	util.Check(err)
 	defer result.Free()
 }
 
-func jsCheck(source string) string {
-	return fmt.Sprintf("ee.emitEvent('typecheck', [`%s`]);", source)
+func jsCheck(source, sourceFile string) string {
+	return fmt.Sprintf("typeCheck(`%s`, `%s`);", sourceFile, source)
 }

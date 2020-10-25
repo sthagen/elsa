@@ -4,9 +4,13 @@
 
 # testing files
 output.js
+benchmarks
+test.ts
 
 # executable
 elsa
+# executable on windows
+elsa.exe
 
 # build cache
 data.go

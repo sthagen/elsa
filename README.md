@@ -4,7 +4,7 @@
 
 <img align="right" src=assets/logo.svg height="120px">
 
-Elsa is a _minimal_, _fast_ and _secure_ runtime for Javascript and Typescript written in Go, leveraging the power from [QuickJS](https://bellard.org/quickjs/).
+Elsa is a _minimal_, _fast_ and _secure_ runtime for JavaScript and TypeScript written in Go, leveraging the power from [QuickJS](https://bellard.org/quickjs/).
 
 ### Features
 
@@ -15,18 +15,6 @@ Elsa is a _minimal_, _fast_ and _secure_ runtime for Javascript and Typescript w
 - Module caching.
 - Bundle your script into a single file.
 - Create a standalone executable for your bundles.
-
-### Coming up
-
-- HTTP server, more Web APIs
-- Easy installation scripts
-- Standard modules
-
-### Benchmarks
-
-Benchmark data for the master branch is available at `benchmarks/`
-
-Also see [Comparison with Deno and Node](./COMPARISON.md)
 
 ### Install
 
@@ -62,21 +50,34 @@ Start by creating an issue about your feature or bug! Then, create a PR and we'l
 
 ### Credits
 
--  [QuickJS](https://bellard.org/quickjs/) - by [Fabrice Bellard](https://bellard.org/) and Charlie Gordon. 
+- [QuickJS](https://bellard.org/quickjs/) - by [Fabrice Bellard](https://bellard.org/) and Charlie Gordon.
 - [Esbuild](https://github.com/evanw/esbuild/) - by [Evan Wallace](https://github.com/evanw)
 
 ### FAQs
 
+**Where to use Elsa and where not to...**
+
+Elsa is small and embeddable into Go programs, using Quickjs as the backend comes with certain pros and cons -
+
+PROS: 
+ * Suitable for CLI applications and shipping them as an executable
+ * Native bindings to system level APIs (webview, etc)
+ * Hosting discord bots on your raspberry pie :wink:
+ * Embeddable inside your Go programs.
+ * General purpose scripting
+
+CONS:
+
+* Slower runtime execution than Node and Deno
+* Slower backends
+* Double GC 
+
+
 **Why choose QuickJS over V8?**
 
-QuickJS is a small and embeddable Javascript engine but it lacks V8's JIT for fast JavaScript execution. Although, it doesn't mean you cannot use Elsa on backends and CPU intensive tasks. 
+QuickJS is a small and embeddable JavaScript engine but it lacks V8's JIT for fast JavaScript execution. Although, it doesn't mean you cannot use Elsa on backends and CPU intensive tasks.
 
 QuickJS has a better startup time than V8 so it would be a strong alternative for CLI apps and short-lived runs.
-
-**Benchmarks are all in favour of Elsa. Why is that?**
-
-The benchmarks currently cover only the startup, bundling and op dispatch speed. These are CLI benchmarks and not of the runtime itself.
-We're working on getting benchmarks for the runtime execution.
 
 **Looks like a QuickJS wrapper to me?**
 
@@ -90,7 +91,7 @@ It is in it's _very early stages_ of development i.e. nothing should be consider
 
 The goal is to fullfil the _bare minimum_ requirements needed for development of a project. Elsa, although aims to be extendable via _plugins_. A few examples of features that are not likely to be included in Elsa are tools for formatting, linting and analysis.
 
-In short, develop - package - ship 
+In short, develop - package - ship
 
 ### License
 

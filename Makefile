@@ -2,15 +2,28 @@ build:
 	go run ./bootstrap
 	go build -o elsa .
 
+release:
+	go run ./bootstrap
+	go build --ldflags "-s -w" -o elsa .
+
 benchmark:
 	# console benchmarks
-	hyperfine './elsa run ./testing/console.js' 'deno run ./testing/console.js' 'node ./testing/console.js' -s full -r 100 --warmup 50 --export-json ./benchmarks/console.json
+	hyperfine './elsa run ./testing/web/console.js' 'deno run ./testing/web/console.js' 'node ./testing/console.js' -s full -r 100 --warmup 50 --export-json ./benchmarks/console.json
 	# bundle benchmarks
-	hyperfine './elsa bundle ./testing/console.js' 'deno bundle ./testing/console.js' -s full -r 100 --warmup 50 --export-json ./benchmarks/bundle.json -i
+	hyperfine './elsa bundle ./testing/web/console.js' 'deno bundle ./testing/web/console.js' -s full -r 100 --warmup 50 --export-json ./benchmarks/bundle.json -i
 	# readFile benchmarks
-	hyperfine './elsa run ./testing/bench_scripts/fs.js --fs' 'deno run --allow-read ./testing/bench_scripts/fs_deno.js' 'node ./testing/bench_scripts/fs_node.js' --warmup 100 -s full -r 100 --export-json ./benchmarks/fs.json
+	hyperfine './elsa run ./testing/bench/fs.js --fs' 'deno run --allow-read ./testing/bench/fs_deno.js' 'node ./testing/bench/fs_node.js' --warmup 100 -s full -r 100 --export-json ./benchmarks/fs.json
 	# PI benchmarks
-	hyperfine 'deno run testing/pi.js' './elsa run testing/pi.js' 'node testing/pi.js' -s full -r 100 --warmup 50 --export-json ./benchmarks/pi.json -i
+	hyperfine 'deno run testing/bench/pi.js' './elsa run testing/bench/pi.js' 'node testing/bench/pi.js' -s full -r 100 --warmup 50 --export-json ./benchmarks/pi.json -i
+
+test:
+	go test ./testing
+	./elsa test --fs --net
+
+test-create-out:
+	./elsa bundle testing/bundle/local_imports.js >> testing/bundle/local_imports.js.out
+	./elsa bundle testing/bundle/hello.ts >> testing/bundle/hello.ts.out
+	./elsa bundle testing/bundle/basics.js >> testing/bundle/basics.js.out
 
 clean-cache:
 	rm -rf /tmp/x.nest.land/
@@ -23,5 +36,8 @@ fmt:
 check-fmt:
 	gofmt -l .
 	prettier --check .
+
+minify-typescript:
+	terser --compress --mangle -o ./typescript/typescript.js -- ./typescript/typescript.js
 
 .PHONY: build benchmark clean-cache fmt check-fmt

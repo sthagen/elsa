@@ -9,8 +9,10 @@ const (
 	FSExists    = 3
 	FSDirExists = 4
 	FSCwd       = 5
-	FSStats     = 6
+	Serve       = 25
+	FSStat      = 6
 	FSRemove    = 7
+	FSMkdir     = 9
 )
 
 // console binding ops
@@ -26,4 +28,9 @@ const (
 // fetch ops
 const (
 	Fetch = 20
+)
+
+// env ops
+const (
+	Env = 11
 )
